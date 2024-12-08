@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Consultation Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --accent-color: #00c2a8;
+            --gradient-1: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            --gradient-2: linear-gradient(135deg, #00c2a8 0%, #00b4db 100%);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f4f7f6 0%, #e6e9f0 100%);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .registration-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .registration-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-1);
+        }
+
+        .registration-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 5 Free';
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #888;
+        }
+
+        .custom-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: linear-gradient(to right, transparent, transparent);
+            padding-right: 40px;
+        }
+
+        .profile-button {
+            background: var(--gradient-1);
+            transition: all 0.3s ease;
+        }
+
+        .profile-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .payment-modal {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .qr-countdown {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .service-icon {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .service-icon:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+
+        .cancel-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-500 mb-8">
+            Professional Consultation Hub
+        </h1>
+
+        <!-- Profile Button -->
+        <div class="mb-6 text-center">
+            <a href="{% url 'UserApp:profile' %}" class="inline-block profile-button text-white py-3 px-6 rounded-md hover:shadow-lg transition duration-300">
+                <i class="fas fa-user-circle mr-2"></i> Go to Profile
+            </a>
+        </div>
+
+        <!-- Doctor Registration Section -->
+        <div class="registration-card">
+            <div class="flex items-center mb-6">
+                <div class="service-icon mr-4">
+                    <i class="fas fa-user-md text-2xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-semibold text-gray-700">Doctor Consultation</h2>
+            </div>
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div class="select-wrapper">
+                    <label for="doctor" class="block text-gray-700 mb-2">Choose a Doctor:</label>
+                    <select name="doctor" id="doctor" required class="custom-select w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select a Doctor</option>
+                        {% for doctor in doctors %}
+                            <option value="{{ doctor.id }}">{{ doctor.name }} - {{ doctor.specialization }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="select-wrapper">
+                    <label for="doctor_payment" class="block text-gray-700 mb-2">Payment Method:</label>
+                    <select name="payment" id="doctor_payment" required class="custom-select w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Payment Method</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="debit_card">Debit Card</option>
+                        <option value="upi">UPI</option>
+                        <option value="net_banking">Net Banking</option>
+                        <option value="wallet">Digital Wallet</option>
+                    </select>
+                </div>
+
+                <button type="submit" name="register_doctor" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-md hover:opacity-90 transition duration-300 pulse-animation">
+                    <i class="fas fa-stethoscope mr-2"></i> Book Doctor Consultation
+                </button>
+            </form>
+        </div>
+
+        <!-- Tutor Registration Section -->
+        <div class="registration-card">
+            <div class="flex items-center mb-6">
+                <div class="service-icon mr-4">
+                    <i class="fas fa-chalkboard-teacher text-2xl text-white"></i>
+                </div>
+                <h2 class="text-2xl font-semibold text-gray-700">Tutor Registration</h2>
+            </div>
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div class="select-wrapper">
+                    <label for="tutor" class="block text-gray-700 mb-2">Choose a Tutor:</label>
+                    <select name="tutor" id="tutor" required class="custom-select w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Select a Tutor</option>
+                        {% for tutor in tutors %}
+                            <option value="{{ tutor.id }}">{{ tutor.name }} - {{ tutor.subject }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="select-wrapper">
+                    <label for="tutor_payment" class="block text-gray-700 mb-2">Payment Method:</label>
+                    <select name="payment" id="tutor_payment" required class="custom-select w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="">Select Payment Method</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="debit_card">Debit Card</option>
+                        <option value="upi">UPI</option>
+                        <option value="net_banking">Net Banking</option>
+                        <option value="wallet">Digital Wallet</option>
+                    </select>
+                </div>
+
+                <button type="submit" name="register_tutor" class="w-full bg-gradient-to-r from-green-500 to-teal-600 text-white py-3 rounded-md hover:opacity-90 transition duration-300 pulse-animation">
+                    <i class="fas fa-book-reader mr-2"></i> Book Tutor Session
+                </button>
+            </form>
+        </div>
+
+        <!-- Success message -->
+        {% if success_message %}
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ success_message }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Payment QR Code Modal -->
+        {% if qr_code_image %}
+        <div id="payment-modal" class="payment-modal fixed inset-0 z-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-8 max-w-md w-full text-center">
+                <div id="countdown" class="qr-countdown text-2xl font-bold mb-4"></div>
+                <img src="{% static 'image/qr3.jpg' %}" alt="UPI QR Code" class="mx-auto max-w-full rounded-lg shadow-lg mb-6">
+                <div id="confirmation-container" class="hidden">
+                    <button id="confirm-payment-btn" class="bg-blue-500 text-white py-3 px-6 rounded-md hover:bg-blue-600 transition duration-300">
+                        Confirm Payment
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Previous QR code modal script remains the same
+        </script>
+        {% endif %}
+
+        <!-- Cancel Registration Sections -->
+        <div class="mt-6 space-y-4 flex justify-center gap-4">
+            {% if doctor %}
+            <form method="POST" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" name="cancel_doctor" class="cancel-btn text-white py-3 px-6 rounded-md hover:opacity-90 transition duration-300">
+                    <i class="fas fa-times-circle mr-2"></i> Cancel Doctor Registration
+                </button>
+            </form>
+            {% endif %}
+
+            {% if tutor %}
+            <form method="POST" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" name="cancel_tutor" class="cancel-btn text-white py-3 px-6 rounded-md hover:opacity-90 transition duration-300">
+                    <i class="fas fa-times-circle mr-2"></i> Cancel Tutor Registration
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Check if the payment modal exists
+        const paymentModal = document.getElementById("payment-modal");
+        const countdownDisplay = document.getElementById("countdown");
+        const confirmationContainer = document.getElementById("confirmation-container");
+
+        if (paymentModal) {
+            let timeLeft = 30; // 30 seconds countdown
+
+            // Display the countdown timer
+            const countdownInterval = setInterval(() => {
+                countdownDisplay.textContent = `Payment confirmation closes in: ${timeLeft}s`;
+                timeLeft--;
+
+                if (timeLeft < 0) {
+                    clearInterval(countdownInterval);
+                    // Hide the modal after countdown
+                    paymentModal.style.display = "none";
+                }
+            }, 1000);
+
+            // Optionally show a confirmation button after the countdown ends
+            setTimeout(() => {
+                countdownDisplay.textContent = "Time's up! Confirm payment if done.";
+                confirmationContainer.style.display = "block";
+            }, 30000); // 30 seconds
+        }
+    });
+</script>

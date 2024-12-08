@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --accent-color: #ff4081;
+            --background-color: #f4f7f6;
+            --card-color: #ffffff;
+            --text-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background-color) 0%, #e0e4e8 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: var(--card-color);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent-color);
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            letter-spacing: 1px;
+        }
+
+        .profile-section {
+            background: linear-gradient(145deg, #f0f5fc, #e6eaf3);
+            border-left: 6px solid var(--primary-color);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 50px 50px 0;
+            border-color: transparent var(--accent-color) transparent transparent;
+        }
+
+        .profile-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-section h2 i {
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+
+        .available-list {
+            background: #f9fafc;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .available-list h3 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        ul li {
+            background: white;
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        ul li:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        button {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+
+        .payment-status {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #e6f2ff, #d1e8ff);
+        }
+
+        .payment-status.failed {
+            background: linear-gradient(145deg, #ffebee, #ffcdd2);
+            color: #d32f2f;
+        }
+
+        .payment-update {
+            background: #f1f8ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .payment-update input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #b0bec5;
+            border-radius: 5px;
+        }
+
+        .back-button {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Profile Dashboard</h1>
+
+        <!-- Account Information -->
+        <div class="profile-section">
+            <h2><i class="fas fa-user-circle"></i>Account Information</h2>
+            <p><strong>Username:</strong> {{ user.username }}</p>
+        </div>
+
+        <!-- Registered Doctor -->
+        <div class="profile-section">
+            <div class="profile-info">
+                <h2><i class="fas fa-user-md"></i>Registered Doctor</h2>
+                {% if doctor %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" name="cancel_doctor">Cancel Registration</button>
+                    </form>
+                {% endif %}
+            </div>
+            {% if doctor %}
+                <p>Name: {{ doctor.name }}</p>
+                <p>Specialization: {{ doctor.specialization }}</p>
+            {% else %}
+                <p class="no-registration">You have not registered for a Doctor yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Available Doctors -->
+        <div class="available-list">
+            <h3>Available Doctors</h3>
+            <ul>
+                {% for doc in doctors %}
+                    <li>
+                        <span>{{ doc.name }} - {{ doc.specialization }}</span>
+                        <i class="fas fa-notes-medical" style="color: var(--secondary-color);"></i>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Registered Tutor -->
+        <div class="profile-section">
+            <div class="profile-info">
+                <h2><i class="fas fa-chalkboard-teacher"></i>Registered Tutor</h2>
+                {% if tutor %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" name="cancel_tutor">Cancel Registration</button>
+                    </form>
+                {% endif %}
+            </div>
+            {% if tutor %}
+                <p>Name: {{ tutor.name }}</p>
+                <p>Subject: {{ tutor.subject }}</p>
+            {% else %}
+                <p class="no-registration">You have not registered for a Tutor yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Available Tutors -->
+        <div class="available-list">
+            <h3>Available Tutors</h3>
+            <ul>
+                {% for t in tutors %}
+                    <li>
+                        <span>{{ t.name }} - {{ t.subject }}</span>
+                        <i class="fas fa-book" style="color: var(--accent-color);"></i>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Payment Status -->
+        <div class="payment-status {% if not payment_status or not payment_status.is_paid %}failed{% endif %}">
+            {% if payment_status %}
+                {% if payment_status.is_paid %}
+                    <p>Your payment status: <strong>Paid</strong></p>
+                {% else %}
+                    <p>Your payment status: <strong>Pending</strong></p>
+                    <div class="payment-update">
+                        <h3>Update Payment Status</h3>
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="text" name="upi_transaction_id" placeholder="Enter UPI Transaction ID" required>
+                            <input type="file" name="payment_screenshot" accept="image/*" required>
+                            <button type="submit" name="update_payment_status">Update Payment</button>
+                        </form>
+                    </div>
+                {% endif %}
+            {% else %}
+                <p>Your payment status: <strong>Not available</strong></p>
+            {% endif %}
+        </div>
+
+        <!-- Back to Dashboard Button -->
+        <div class="back-button">
+            <a href="{% url 'UserApp:user_home' %}">
+                <button>Back to Dashboard</button>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
